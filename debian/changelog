@@ -1,0 +1,6 @@
+socks-proxy-manager (0.1.0) unstable; urgency=medium
+
+  * Initial release
+  * Basic package functionality implemented
+
+ -- Maintainer <kuksyenok.i.s@gmail.com>  Wed, 08 Jan 2025 16:16:00 +0300
