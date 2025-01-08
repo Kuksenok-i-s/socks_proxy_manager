@@ -50,10 +50,15 @@ class Utils:
     @staticmethod
     def handle_service_action(action: str) -> str:
         try:
-            result = subprocess.run(["systemctl", action, SERVICE_NAME], capture_output=True, text=True, check=True,)
+            result = subprocess.run(
+                ["systemctl", action, SERVICE_NAME],
+                capture_output=True,
+                text=True,
+                check=True,
+            )
             return result.stdout.strip()
         except subprocess.CalledProcessError as e:
-            logger.error(f"Failed to get service {action}. Error: {e.stderr.decode()}")
+            logger.error(f"Failed to get service {action}.")
             sys.exit(1)
 
     @staticmethod
@@ -61,12 +66,12 @@ class Utils:
         if port < 1000 or port > 65535:
             logger.error(f"Invalid port number: {port}. Port must be between 1000 and 65535.")
             sys.exit(1)
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        result = sock.connect_ex(("127.0.0.1", int(port)))
-        if result != 0:
+        try:
+            subprocess.run(["lsof", "-i", f":{port}"], capture_output=True, check=True)
             logger.error(f"Port {port} is already in use.")
-            sock.close()
             sys.exit(1)
+        except subprocess.CalledProcessError:
+            pass
 
 
 class ProxyManager:
@@ -89,7 +94,12 @@ class ProxyManager:
 
     def create_service(self) -> None:
         service_file_path = f"/etc/systemd/system/{SERVICE_NAME}"
-        content = SERVICE_FILE_CONTENT.format(ssh_user=self.ssh_user, ssh_host=self.ssh_host, port=self.port)
+        content = SERVICE_FILE_CONTENT.format(
+            ssh_user=self.ssh_user,
+            ssh_host=self.ssh_host,
+            ssh_port=self.ssh_port,
+            port=self.port,
+        )
 
         try:
             with open(service_file_path, "w", encoding="utf-8") as service_file:

@@ -3,6 +3,7 @@ import argparse
 
 from proxy_manager.main_logic import ProxyManager, Utils
 
+
 def main():
 
     parser = argparse.ArgumentParser(description="Manage SOCKS proxy service")
