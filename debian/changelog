@@ -1,3 +1,9 @@
+socks-proxy-manager (0.2.0) unstable; urgency=medium
+
+  * Add cosmetic printouts
+
+ -- Maintainer <kuksyenok.i.s@gmail.com>  Wed, 08 Jan 2025 22:42:00 +0300
+
 socks-proxy-manager (0.1.0) unstable; urgency=medium
 
   * Initial release

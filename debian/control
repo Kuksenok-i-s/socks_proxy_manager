@@ -3,7 +3,7 @@ Maintainer: Ilya Kuksenok <ilya.kuksenok@gmail.com>
 Section: utils
 Priority: optional
 Build-Depends: python3-all, python3-setuptools
-Standards-Version: 0.1.0
+Standards-Version: 0.2.0
 
 Package: socks-proxy-manager
 Architecture: all

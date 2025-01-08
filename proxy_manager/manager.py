@@ -17,6 +17,7 @@ def main():
     update_parser.add_argument("ssh_user", help="SSH username")
     update_parser.add_argument("ssh_host", help="SSH host")
     update_parser.add_argument("ssh_port", help="SSH port")
+    update_parser.add_argument("proxy_port", help="Proxy port")
 
     subparsers.add_parser("start", help="Start proxy service")
     subparsers.add_parser("stop", help="Stop proxy service")
@@ -33,8 +34,17 @@ def main():
     if args.action == "create":
         if not args.ssh_port:
             args.ssh_port = 22
-        pm = ProxyManager(args.ssh_user, args.ssh_host, args.ssh_port)
+        pm = ProxyManager(
+            args.ssh_user,
+            args.ssh_host,
+            args.ssh_port,
+            local_port=args.proxy_port,
+        )
         pm.create_service()
+        print("Service created successfully!")
+        print("Service name:", pm.service_name)
+        print("Service file path:", pm.service_file_path)
+        print(f"Service URL: http://localhost:{args.proxy_port}/")
     elif args.action == "update":
         pm = ProxyManager(args.ssh_user, args.ssh_host)
         pm.update_service()
