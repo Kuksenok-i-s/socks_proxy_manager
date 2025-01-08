@@ -1,7 +1,7 @@
 import sys
-from proxy_manager.main_logic import ProxyManager, Utils
 import argparse
 
+from proxy_manager.main_logic import ProxyManager, Utils
 
 def main():
 

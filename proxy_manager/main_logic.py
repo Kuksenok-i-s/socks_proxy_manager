@@ -3,7 +3,6 @@ import sys
 import subprocess
 import socket
 import syslog
-from functools import wraps
 
 import logging
 
@@ -51,7 +50,7 @@ class Utils:
     @staticmethod
     def handle_service_action(action: str) -> str:
         try:
-            result = subprocess.run(["systemctl", action, SERVICE_NAME], capture_output=True, text=True)
+            result = subprocess.run(["systemctl", action, SERVICE_NAME], capture_output=True, text=True, check=True,)
             return result.stdout.strip()
         except subprocess.CalledProcessError as e:
             logger.error(f"Failed to get service {action}. Error: {e.stderr.decode()}")
@@ -71,7 +70,13 @@ class Utils:
 
 
 class ProxyManager:
-    def __init__(self, ssh_user, ssh_host, local_port: int = 22054, ssh_port: int = 22):
+    def __init__(
+        self,
+        ssh_user: str = None,
+        ssh_host: str = None,
+        local_port: int = 22054,
+        ssh_port: int = 22,
+    ):
         Utils.check_root_permissions()
         Utils.check_port(local_port)
         Utils.install_ssh_keys(ssh_user, ssh_host)
@@ -87,7 +92,7 @@ class ProxyManager:
         content = SERVICE_FILE_CONTENT.format(ssh_user=self.ssh_user, ssh_host=self.ssh_host, port=self.port)
 
         try:
-            with open(service_file_path, "w") as service_file:
+            with open(service_file_path, "w", encoding="utf-8") as service_file:
                 service_file.write(content)
             logger.info(f"Service file created at {service_file_path}.")
             subprocess.run(["systemctl", "daemon-reload"], check=True)
@@ -110,14 +115,13 @@ class ProxyManager:
             sys.exit(1)
         except FileNotFoundError:
             logger.error(f"Service file {SERVICE_NAME} not found. Continue.")
-            pass
         except Exception as e:
             logger.error(f"Error removing service: {e}")
             sys.exit(1)
 
     def update_service(self) -> None:
         self.remove_service()
-        self.create_service(self.ssh_user, self.ssh_host)
+        self.create_service()
         Utils.handle_service_action("enable")
         Utils.handle_service_action("start")
         logger.info("Service updated.")
