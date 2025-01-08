@@ -1,0 +1,14 @@
+[MESSAGES CONTROL]
+disable=C0111
+
+[FORMAT]
+max-line-length=127
+
+[BASIC]
+good-names=i,j,k,ex,Run,_,id,f
+
+[SIMILARITIES]
+min-similarity-lines=7
+ignore-comments=yes
+ignore-docstrings=yes
+ignore-imports=yes

@@ -97,7 +97,6 @@ class ProxyManager:
             logger.error(f"Error creating service: {e}")
             sys.exit(1)
 
-
     @staticmethod
     def remove_service() -> None:
         try:
@@ -115,7 +114,6 @@ class ProxyManager:
         except Exception as e:
             logger.error(f"Error removing service: {e}")
             sys.exit(1)
-
 
     def update_service(self) -> None:
         self.remove_service()
