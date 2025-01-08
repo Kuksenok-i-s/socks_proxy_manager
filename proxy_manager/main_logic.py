@@ -1,7 +1,6 @@
 import os
 import sys
 import subprocess
-import socket
 import syslog
 
 import logging
@@ -57,7 +56,7 @@ class Utils:
                 check=True,
             )
             return result.stdout.strip()
-        except subprocess.CalledProcessError as e:
+        except subprocess.CalledProcessError:
             logger.error(f"Failed to get service {action}.")
             sys.exit(1)
 
