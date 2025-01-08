@@ -13,6 +13,7 @@ setup(
     description="A tool to manage SOCKS proxy via SSH with systemd.",
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
+    requires=["toml"],
     author="Ilya Kuksenok",
     author_email="kuksyenok.i.s@gmail.com",
     url="https://github.com/yourname/socks-proxy-manager",
