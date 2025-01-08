@@ -1,0 +1,7 @@
+[ssh]
+user = "service"
+host = "10.102.12.10"
+port = 2202
+
+[proxy]
+port = 12456
