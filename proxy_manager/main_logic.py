@@ -1,4 +1,3 @@
-import os
 import sys
 import subprocess
 
@@ -44,25 +43,8 @@ class ProxyManager:
             logger.error(f"Error creating service: {e}")
             sys.exit(1)
 
-    @staticmethod
-    def remove_service() -> None:
-        try:
-            Utils.handle_service_action("stop")
-            Utils.handle_service_action("disable")
-            os.remove(f"/etc/systemd/system/{SERVICE_NAME}")
-            subprocess.run(["systemctl", "daemon-reload"], check=True)
-            logger.info(f"Service {SERVICE_NAME} removed.")
-        except subprocess.CalledProcessError:
-            logger.error(f"Failed to remove the service. Check the logs.")
-            sys.exit(1)
-        except FileNotFoundError:
-            logger.error(f"Service file {SERVICE_NAME} not found. Continue.")
-        except Exception as e:
-            logger.error(f"Error removing service: {e}")
-            sys.exit(1)
-
     def update_service(self) -> None:
-        self.remove_service()
+        Utils.remove_service()
         self.create_service()
         Utils.handle_service_action("enable")
         Utils.handle_service_action("start")

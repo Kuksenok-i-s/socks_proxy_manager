@@ -29,6 +29,10 @@ logger.setLevel(logging.INFO)
 syslog_handler = SysLogHandler()
 logger.addHandler(syslog_handler)
 
+stdout_handler = logging.StreamHandler(sys.stdout)
+stdout_handler.setLevel(logging.INFO)
+logger.addHandler(stdout_handler)
+
 
 class Config:
     def __init__(self, config_file: str = "config.toml"):
@@ -75,11 +79,10 @@ class Utils:
             if not Utils.check_if_ssh_keys_installed(ssh_user, ssh_host):
                 logger.info("SSH keys not found. Installing...")
                 subprocess.run(["ssh-keygen", "-t", "ed25519", "-f", "~/.ssh/id_ed25519"], check=True)
-                subprocess.run(["ssh-copy-id", f"{ssh_user}@{ssh_host}"], check=True)
                 logger.info("SSH keys installed successfully.")
             else:
                 logger.info("SSH keys already exist.")
-            subprocess.run(["ssh-copy-id", f"{ssh_user}@{ssh_host}"], check=True)
+            subprocess.run(["ssh-copy-id", f"{ssh_user}@{ssh_host}"], check=True, stderr=subprocess.DEVNULL)
         except subprocess.CalledProcessError:
             logger.error(f"Failed to install SSH keys for {ssh_user}@{ssh_host}.")
             sys.exit(1)
@@ -102,7 +105,7 @@ class Utils:
             )
             return result.stdout.strip()
         except subprocess.CalledProcessError:
-            logger.error(f"Failed to get service {action}.")
+            logger.error(f"Failed to {action} service {SERVICE_NAME}.")
             sys.exit(1)
 
     @staticmethod
@@ -118,3 +121,20 @@ class Utils:
             sys.exit(1)
         except subprocess.CalledProcessError:
             pass
+
+    @classmethod
+    def remove_service(cls) -> None:
+        try:
+            cls.handle_service_action("stop")
+            cls.handle_service_action("disable")
+            os.remove(f"/etc/systemd/system/{SERVICE_NAME}")
+            subprocess.run(["systemctl", "daemon-reload"], check=True)
+            logger.info(f"Service {SERVICE_NAME} removed.")
+        except subprocess.CalledProcessError:
+            logger.error(f"Failed to remove the service. Check the logs.")
+            sys.exit(1)
+        except FileNotFoundError:
+            logger.error(f"Service file {SERVICE_NAME} not found. Continue.")
+        except Exception as e:
+            logger.error(f"Error removing service: {e}")
+            sys.exit(1)

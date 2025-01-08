@@ -2,11 +2,11 @@ Source: socks-proxy-manager
 Maintainer: Ilya Kuksenok <ilya.kuksenok@gmail.com>
 Section: utils
 Priority: optional
-Build-Depends: python3-all, python3-setuptools
+Build-Depends: python3-all, python3-setuptools, python3-toml
 Standards-Version: 0.2.0
 
 Package: socks-proxy-manager
 Architecture: all
-Depends: ${misc:Depends}, ${python3:Depends}, openssh-client
+Depends: ${misc:Depends}, ${python3:Depends}, openssh-client, python3-toml
 Description: SOCKS Proxy Manager
  A tool to manage SSH SOCKS proxy connections as systemd services
