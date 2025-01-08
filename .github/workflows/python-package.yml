@@ -30,10 +30,16 @@ jobs:
         python -m pip install black pytest
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
         if [ -f test-requirements.txt ]; then pip install -r test-requirements.txt; fi
-    - name: Lint with black
+    - name: Check format with black
       run: |
         # stop the build if there are Python syntax errors or undefined names
         black --check -l127 proxy_manager/*.py
+    
+    - name: Lint with Pylint
+      run: |
+        # stop the build if there are Python syntax errors or undefined names
+        pylint proxy_manager/*.py
+      
     - name: Test with pytest
       run: |
         pip install -e .
