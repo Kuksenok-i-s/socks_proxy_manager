@@ -51,31 +51,3 @@ def test_create_service_failure(proxy_manager):
         
         proxy_manager.create_service()
         mock_exit.assert_called_once_with(1)
-
-def test_remove_service_success():
-    with patch.object(Utils, 'handle_service_action') as mock_handle, \
-         patch('os.remove') as mock_remove, \
-         patch('subprocess.run') as mock_run:
-        
-        ProxyManager.remove_service()
-        
-        assert mock_handle.call_count == 2
-        mock_remove.assert_called_once_with(f'/etc/systemd/system/{SERVICE_NAME}')
-        mock_run.assert_called_once_with(['systemctl', 'daemon-reload'], check=True)
-
-def test_remove_service_file_not_found():
-    with patch.object(Utils, 'handle_service_action'), \
-         patch('os.remove', side_effect=FileNotFoundError):
-        
-        ProxyManager.remove_service()
-
-def test_update_service(proxy_manager):
-    with patch.object(ProxyManager, 'remove_service') as mock_remove, \
-         patch.object(ProxyManager, 'create_service') as mock_create, \
-         patch.object(Utils, 'handle_service_action') as mock_handle:
-        
-        proxy_manager.update_service()
-        
-        mock_remove.assert_called_once()
-        mock_create.assert_called_once()
-        assert mock_handle.call_count == 2

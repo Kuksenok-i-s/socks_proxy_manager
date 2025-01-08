@@ -135,6 +135,7 @@ class Utils:
             sys.exit(1)
         except FileNotFoundError:
             logger.error(f"Service file {SERVICE_NAME} not found. Continue.")
+            sys.exit(0)
         except Exception as e:
             logger.error(f"Error removing service: {e}")
             sys.exit(1)
