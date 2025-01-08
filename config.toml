@@ -1,0 +1,7 @@
+[ssh]
+user = "root"
+host = "165.227.169.6"
+port = 22
+
+[proxy]
+port = 1080

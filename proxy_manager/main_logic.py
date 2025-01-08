@@ -1,76 +1,9 @@
 import os
 import sys
 import subprocess
-import syslog
 
-import logging
-
+from .utils import Utils, logger
 from .constants import SERVICE_NAME, SERVICE_FILE_CONTENT
-
-
-class SysLogHandler(logging.Handler):
-    def __init__(self, ident="PROXY_MANAGER"):
-        super().__init__()
-        self.ident = ident
-        syslog.openlog(ident=self.ident, facility=syslog.LOG_LOCAL0)
-
-    def emit(self, record):
-        msg = self.format(record)
-        syslog.syslog(msg)
-
-    def close(self):
-        syslog.closelog()
-        super().close()
-
-
-logger = logging.getLogger("proxy_manager")
-logger.setLevel(logging.INFO)
-
-syslog_handler = SysLogHandler()
-logger.addHandler(syslog_handler)
-
-
-class Utils:
-    @staticmethod
-    def install_ssh_keys(ssh_user, ssh_host) -> None:
-        try:
-            subprocess.run(["ssh-copy-id", f"{ssh_user}@{ssh_host}"], check=True)
-        except subprocess.CalledProcessError:
-            logger.error(f"Failed to install SSH keys for {ssh_user}@{ssh_host}.")
-            sys.exit(1)
-
-    @staticmethod
-    def check_root_permissions() -> None:
-        if os.geteuid() != 0:
-            logger.error("This script must run as root.")
-            print("Please run this script as root.")
-            sys.exit(1)
-
-    @staticmethod
-    def handle_service_action(action: str) -> str:
-        try:
-            result = subprocess.run(
-                ["systemctl", action, SERVICE_NAME],
-                capture_output=True,
-                text=True,
-                check=True,
-            )
-            return result.stdout.strip()
-        except subprocess.CalledProcessError:
-            logger.error(f"Failed to get service {action}.")
-            sys.exit(1)
-
-    @staticmethod
-    def check_port(port) -> None:
-        if port < 1000 or port > 65535:
-            logger.error(f"Invalid port number: {port}. Port must be between 1000 and 65535.")
-            sys.exit(1)
-        try:
-            subprocess.run(["lsof", "-i", f":{port}"], capture_output=True, check=True)
-            logger.error(f"Port {port} is already in use.")
-            sys.exit(1)
-        except subprocess.CalledProcessError:
-            pass
 
 
 class ProxyManager:

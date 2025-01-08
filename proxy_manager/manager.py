@@ -1,7 +1,22 @@
 import sys
 import argparse
 
+
 from proxy_manager.main_logic import ProxyManager, Utils
+from proxy_manager.utils import Config, logger
+
+
+def pm_init(args) -> ProxyManager:
+    if args.config_file:
+        config = Config(args.config_file)
+        return ProxyManager(**config.get_config())
+
+    return ProxyManager(
+        ssh_host=args.ssh_host,
+        ssh_user=args.ssh_user,
+        local_port=args.proxy_port,
+        ssh_port=args.ssh_port,
+    )
 
 
 def main():
@@ -10,13 +25,16 @@ def main():
     subparsers = parser.add_subparsers(dest="action", help="Action to perform")
 
     create_parser = subparsers.add_parser("create", help="Create a new proxy service")
+    create_parser.add_argument("config_file", help="Path to the TOML config file", default="config.toml", required=False)
     create_parser.add_argument("ssh_user", help="SSH username")
     create_parser.add_argument("ssh_host", help="SSH host")
+    create_parser.add_argument("ssh_port", help="SSH port", default=22)
+    create_parser.add_argument("proxy_port", help="Proxy port")
 
     update_parser = subparsers.add_parser("update", help="Update proxy service")
     update_parser.add_argument("ssh_user", help="SSH username")
     update_parser.add_argument("ssh_host", help="SSH host")
-    update_parser.add_argument("ssh_port", help="SSH port")
+    update_parser.add_argument("ssh_port", help="SSH port", default=22)
     update_parser.add_argument("proxy_port", help="Proxy port")
 
     subparsers.add_parser("start", help="Start proxy service")
@@ -32,22 +50,21 @@ def main():
         sys.exit(1)
 
     if args.action == "create":
-        if not args.ssh_port:
-            args.ssh_port = 22
-        pm = ProxyManager(
-            args.ssh_user,
-            args.ssh_host,
-            args.ssh_port,
-            local_port=args.proxy_port,
-        )
+        pm = pm_init(args)
         pm.create_service()
         print("Service created successfully!")
         print("Service name:", pm.service_name)
         print("Service file path:", pm.service_file_path)
-        print(f"Service URL: http://localhost:{args.proxy_port}/")
+        print(f"Service URL: localhost:{args.proxy_port}")
+        logger.info(f"Service URL: localhost:{args.proxy_port}")
     elif args.action == "update":
-        pm = ProxyManager(args.ssh_user, args.ssh_host)
+        pm = pm_init(args)
         pm.update_service()
+        print("Service updated successfully!")
+        print("Service name:", pm.service_name)
+        print("Service file path:", pm.service_file_path)
+        print(f"Service URL: localhost:{args.proxy_port}")
+        logger.info(f"Service URL: localhost:{args.proxy_port}")
     elif args.action == "remove":
         pm = ProxyManager()
         pm.remove_service()
