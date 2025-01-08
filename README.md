@@ -60,7 +60,13 @@ pip install -e .
 sudo apt update -yqq
 sudo apt install -yqq openssh-client
 sudo apt install -yqq  build-essential devscripts debhelper
-sudo apt install -yqq python3-all dh-python python3-all python3-setuptools python3-pip
+sudo apt install -yqq python3-all dh-python python3-all python3-setuptools python3-pip python3-toml
+```
+
+1.1 Install runtime dependencies:
+
+```bash
+sudo apt install -yqq python3 openssh-client python3-toml
 ```
 
 2. Clone the repository:
@@ -120,6 +126,18 @@ socks-proxy-manager status
 socks-proxy-manager create --user username --host remote.server.com --port 22 --proxy-port 1080
 # Start a SOCKS proxy
 # other commands will  be the same as with a config file
+```
+
+**Example output**
+
+```bash
+sudo proxy-manager create --config-file config.toml
+SSH keys already exist.
+Service file created at /etc/systemd/system/socks-proxy.service.
+Service created successfully!
+Service name: socks-proxy.service
+Service file path: /etc/systemd/system/socks-proxy.service
+Service URL: localhost:1080
 ```
 
 ## Contributing
